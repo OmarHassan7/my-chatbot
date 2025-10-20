@@ -2,13 +2,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-from openai import OpenAI
 import os
 
 # Initialize FastAPI app
 app = FastAPI(title="Chatbot API", version="1.0.0")
-# Load environment variables
-API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Configure CORS
 app.add_middleware(
@@ -39,25 +36,34 @@ def get_llm_response(message: str, conversation_history: list = None) -> str:
     - Anthropic Claude API
     - Hugging Face models
     - Local models
-    AIzaSyAc6-L2Df6sIIfoWSvrVILh7F2B6tw6pbE
-    """    
-    client = OpenAI(
-        api_key=API_KEY,
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-    )
+    """
     
-    messages = conversation_history or []
-    messages.append({"role": "user", "content": message})
+    # Example with OpenAI (uncomment and add your API key)
+    # import openai
+    # openai.api_key = os.getenv("OPENAI_API_KEY")
+    # 
+    # messages = conversation_history or []
+    # messages.append({"role": "user", "content": message})
+    # 
+    # response = openai.ChatCompletion.create(
+    #     model="gpt-3.5-turbo",
+    #     messages=messages
+    # )
+    # return response.choices[0].message.content
     
-    response = client.ChatCompletion.create(
-        model="gemini-2.5-flash",
-        messages=messages
-    )
-    return response.choices[0].message.content
+    # Example with Anthropic Claude (uncomment and add your API key)
+    # import anthropic
+    # client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    # 
+    # response = client.messages.create(
+    #     model="claude-3-sonnet-20240229",
+    #     max_tokens=1024,
+    #     messages=[{"role": "user", "content": message}]
+    # )
+    # return response.content[0].text
     
-
-    
-    
+    # Placeholder response (replace with actual LLM)
+    return f"Echo: {message} (Replace this with your LLM integration)"
 
 @app.get("/")
 async def root():
