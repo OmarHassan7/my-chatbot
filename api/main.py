@@ -27,43 +27,36 @@ class ChatResponse(BaseModel):
 
 # In-memory conversation storage (replace with database in production)
 conversations = {}
-
 def get_llm_response(message: str, conversation_history: list = None) -> str:
     """
-    Replace this function with your actual LLM integration
-    Examples:
-    - OpenAI API
-    - Anthropic Claude API
-    - Hugging Face models
-    - Local models
+    Example with Google Gemini API
     """
-    
-    # Example with OpenAI (uncomment and add your API key)
-    # import openai
-    # openai.api_key = os.getenv("OPENAI_API_KEY")
-    # 
-    # messages = conversation_history or []
-    # messages.append({"role": "user", "content": message})
-    # 
-    # response = openai.ChatCompletion.create(
-    #     model="gpt-3.5-turbo",
-    #     messages=messages
-    # )
-    # return response.choices[0].message.content
-    
-    # Example with Anthropic Claude (uncomment and add your API key)
-    # import anthropic
-    # client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-    # 
-    # response = client.messages.create(
-    #     model="claude-3-sonnet-20240229",
-    #     max_tokens=1024,
-    #     messages=[{"role": "user", "content": message}]
-    # )
-    # return response.content[0].text
-    
-    # Placeholder response (replace with actual LLM)
-    return f"Echo: {message} (Replace this with your LLM integration)"
+    import google.generativeai as genai
+
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("Missing GEMINI_API_KEY environment variable")
+
+    genai.configure(api_key=api_key)
+
+    # Choose model
+    model = genai.GenerativeModel("gemini-1.5-flash")  # or "gemini-1.5-pro"
+
+    # Build conversation text (if any history)
+    history_text = ""
+    if conversation_history:
+        for msg in conversation_history:
+            role = msg["role"].capitalize()
+            history_text += f"{role}: {msg['content']}\n"
+
+    # Combine conversation history + new message
+    prompt = f"{history_text}User: {message}\nAssistant:"
+
+    # Generate response
+    response = model.generate_content(prompt)
+
+    return response.text.strip() if response and response.text else "Sorry, I couldn't generate a response."
+
 
 @app.get("/")
 async def root():
