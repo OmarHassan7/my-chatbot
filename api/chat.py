@@ -6,7 +6,7 @@ from openai import OpenAI
 import os
 from mangum import Mangum
 
-app = FastAPI()
+app = FastAPI(title="Chat API", version="1.0.0")
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -14,7 +14,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -46,6 +46,10 @@ def get_llm_response(message: str, conversation_history: list = None) -> str:
     )
     return response.choices[0].message.content
 
+@app.get("/")
+def health_check():
+    return {"status": "healthy", "message": "Chat API is running"}
+
 @app.post("/")
 def chat(request: ChatRequest):
     try:
@@ -76,6 +80,8 @@ def chat(request: ChatRequest):
         )
         
     except Exception as e:
+        print(f"Error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Vercel handler
 handler = Mangum(app, lifespan="off")
