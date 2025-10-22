@@ -114,7 +114,3 @@ async def clear_conversation(conversation_id: str):
         return {"message": "Conversation cleared"}
     return {"message": "Conversation not found"}
 
-# For Vercel deployment
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
