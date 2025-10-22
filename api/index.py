@@ -51,6 +51,14 @@ def root():
         "version": "1.0.0"
     }
 
+@app.get("/api/health")
+def health_check():
+    return {
+        "status": "healthy",
+        "message": "API is working correctly",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+
 @app.post("/api/chat")
 def chat(request: ChatRequest):
     try:
@@ -89,6 +97,5 @@ def clear_conversation(conversation_id: str):
         del conversations[conversation_id]
         return {"message": "Conversation cleared"}
     return {"message": "Conversation not found"}
-
-# Mangum handler for Vercel
+    
 handler = Mangum(app, lifespan="off")
