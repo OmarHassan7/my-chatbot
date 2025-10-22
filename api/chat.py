@@ -4,7 +4,12 @@ from pydantic import BaseModel
 from typing import Optional
 from openai import OpenAI
 import os
+import logging
 from mangum import Mangum
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Chat API", version="1.0.0")
 
@@ -30,28 +35,40 @@ conversations = {}
 
 def get_llm_response(message: str, conversation_history: list = None) -> str:
     if not API_KEY:
+        logger.error("API key not configured")
         raise HTTPException(status_code=500, detail="API key not configured")
     
-    client = OpenAI(
-        api_key=API_KEY,
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-    )
-    
-    messages = conversation_history or []
-    messages.append({"role": "user", "content": message})
-    
-    response = client.chat.completions.create(
-        model="gemini-2.0-flash-exp",
-        messages=messages
-    )
-    return response.choices[0].message.content
+    try:
+        client = OpenAI(
+            api_key=API_KEY,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        )
+        
+        messages = conversation_history or []
+        messages.append({"role": "user", "content": message})
+        
+        logger.info(f"Sending request to Gemini with {len(messages)} messages")
+        response = client.chat.completions.create(
+            model="gemini-2.0-flash-exp",
+            messages=messages
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"Error calling Gemini API: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"LLM API error: {str(e)}")
 
 @app.get("/")
 def health_check():
-    return {"status": "healthy", "message": "Chat API is running"}
+    logger.info("Health check requested")
+    return {
+        "status": "healthy", 
+        "message": "Chat API is running",
+        "api_key_configured": bool(API_KEY)
+    }
 
 @app.post("/")
 def chat(request: ChatRequest):
+    logger.info(f"Chat request received: {request.message[:50]}...")
     try:
         if not request.message.strip():
             raise HTTPException(status_code=400, detail="Message cannot be empty")
@@ -74,13 +91,16 @@ def chat(request: ChatRequest):
             "content": response_text
         })
         
+        logger.info(f"Response generated successfully for conversation {conv_id}")
         return ChatResponse(
             response=response_text,
             conversation_id=conv_id
         )
         
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error in chat: {str(e)}")
+        logger.error(f"Unexpected error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Vercel handler
