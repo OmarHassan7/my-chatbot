@@ -131,8 +131,9 @@
         const [input, setInput] = useState("");
         const [loading, setLoading] = useState(false);
         const [apiEndpoint, setApiEndpoint] = useState(
-          "http://localhost:8000/api/chat"
+          "https://chatbot-project-theta-one.vercel.app/api/chat"
         );
+
         const messagesEndRef = useRef(null);
 
         const scrollToBottom = () => {
