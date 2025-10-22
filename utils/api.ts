@@ -16,7 +16,13 @@ export const sendMessage = async (
   console.log("📝 Message:", message);
 
   try {
-    const response = await fetch(endpoint, {
+    // Ensure we have a proper base URL for production
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+    
+    console.log("🌐 Full URL:", fullUrl);
+
+    const response = await fetch(fullUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,7 +54,10 @@ export const sendMessage = async (
 export const checkApiStatus = async (
   endpoint: string = "/api"
 ): Promise<any> => {
-  const response = await fetch(endpoint);
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const fullUrl = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+  
+  const response = await fetch(fullUrl);
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
