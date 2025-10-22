@@ -6,7 +6,7 @@ from openai import OpenAI
 import os
 from mangum import Mangum
 
-app = FastAPI(title="Chatbot API", version="1.0.0")
+app = FastAPI()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -46,22 +46,7 @@ def get_llm_response(message: str, conversation_history: list = None) -> str:
     )
     return response.choices[0].message.content
 
-@app.get("/")
-def root():
-    return {
-        "status": "online",
-        "message": "Chatbot API is running",
-        "version": "1.0.0"
-    }
-
-@app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "message": "API is working correctly"
-    }
-
-@app.post("/chat")
+@app.post("/")
 def chat(request: ChatRequest):
     try:
         if not request.message.strip():
@@ -93,11 +78,4 @@ def chat(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.delete("/conversation/{conversation_id}")
-def clear_conversation(conversation_id: str):
-    if conversation_id in conversations:
-        del conversations[conversation_id]
-        return {"message": "Conversation cleared"}
-    return {"message": "Conversation not found"}
-    
 handler = Mangum(app, lifespan="off")

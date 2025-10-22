@@ -6,11 +6,27 @@
             "use": "@vercel/python"
         },
         {
+            "src": "api/chat.py",
+            "use": "@vercel/python"
+        },
+        {
+            "src": "api/test.py",
+            "use": "@vercel/python"
+        },
+        {
             "src": "package.json",
             "use": "@vercel/next"
         }
     ],
     "routes": [
+        {
+            "src": "/api/test",
+            "dest": "/api/test.py"
+        },
+        {
+            "src": "/api/chat",
+            "dest": "/api/chat.py"
+        },
         {
             "src": "/api/(.*)",
             "dest": "/api/index.py"
