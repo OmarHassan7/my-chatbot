@@ -2,4 +2,3 @@ fastapi
 mangum
 openai
 pydantic
-uvicorn

@@ -11,7 +11,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Chat API", version="1.0.0")
+app = FastAPI(title="Chat API", version="0.1.0")
 
 # Get API key from environment variable
 API_KEY = os.getenv("GEMINI_API_KEY")
