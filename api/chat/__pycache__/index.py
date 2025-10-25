@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 from openai import OpenAI
-from mangum import Mangum
 import os
 import logging
 
@@ -18,12 +17,15 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:3000",  # Local development
+        "https://chatbot-project-theta-one.vercel.app/",  # Your Vercel URL
+        "https://*.vercel.app",  # All Vercel preview deployments
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
-
 class ChatRequest(BaseModel):
     message: str
     conversation_id: Optional[str] = None
@@ -108,8 +110,3 @@ async def chat(request: ChatRequest):
     except Exception as e:
         logger.error(f"Unexpected error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-
-handler = Mangum(app)
-
