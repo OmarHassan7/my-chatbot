@@ -14,28 +14,10 @@
             "use": "@vercel/next"
         }
     ],
-    "routes": [
+    "rewrites": [
         {
-            "src": "/api/test",
-            "dest": "/api/test/index.py",
-            "methods": [
-                "GET",
-                "POST",
-                "OPTIONS"
-            ]
-        },
-        {
-            "src": "/api/chat",
-            "dest": "/api/chat/index.py",
-            "methods": [
-                "GET",
-                "POST",
-                "OPTIONS"
-            ]
-        },
-        {
-            "src": "/(.*)",
-            "dest": "/$1"
+            "source": "/(.*)",
+            "destination": "/api/chat/index"
         }
     ]
 }

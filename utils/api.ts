@@ -10,13 +10,21 @@ interface ChatResponse {
 
 export const sendMessage = async (
   message: string,
-  endpoint: string = "http://localhost:8000"
+  endpoint: string = "/api/chat"
 ): Promise<ChatResponse> => {
   console.log("🚀 Sending message to:", endpoint);
   console.log("📝 Message:", message);
 
   try {
-    const response = await fetch(endpoint, {
+    // Ensure we have a proper base URL for production
+    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+    const fullUrl = endpoint.startsWith("http")
+      ? endpoint
+      : `${baseUrl}${endpoint}`;
+
+    console.log("🌐 Full URL:", fullUrl);
+
+    const response = await fetch(fullUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

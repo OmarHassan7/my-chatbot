@@ -15,8 +15,8 @@ const ChatbotInterface: React.FC = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  // Change default endpoint to localhost:8000
-  const [apiEndpoint, setApiEndpoint] = useState("http://localhost:8000");
+  // Use Vercel production API endpoint
+  const [apiEndpoint, setApiEndpoint] = useState("/api/chat");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

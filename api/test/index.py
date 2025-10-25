@@ -20,7 +20,4 @@ def test():
 def test_post():
     return {"message": "POST endpoint is working!", "status": "success"}
 
-mangum_handler = Mangum(app, lifespan="off")
-
-def handler(request):
-    return mangum_handler(request)
+handler = Mangum(app, lifespan="off")
