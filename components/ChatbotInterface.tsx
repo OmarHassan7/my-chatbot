@@ -15,7 +15,8 @@ const ChatbotInterface: React.FC = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [apiEndpoint, setApiEndpoint] = useState("/api/chat");
+  // Change default endpoint to localhost:8000
+  const [apiEndpoint, setApiEndpoint] = useState("http://localhost:8000");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -80,9 +81,7 @@ const ChatbotInterface: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">AI Chatbot</h1>
-                <p className="text-sm text-purple-300">
-                  Powered by Next.jsss & FastAPI
-                </p>
+                <p className="text-sm text-purple-300">Powered by Gemini API</p>
               </div>
             </div>
             <div className="flex items-center gap-2">

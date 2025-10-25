@@ -1,11 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 from openai import OpenAI
 import os
 import logging
-from mangum import Mangum
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -13,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Chat API", version="1.0.0")
 
+# Get API key from environment variable
 API_KEY = os.getenv("GEMINI_API_KEY")
 
 app.add_middleware(
@@ -31,12 +31,16 @@ class ChatResponse(BaseModel):
     response: str
     conversation_id: Optional[str] = None
 
+# Store conversations in memory
 conversations = {}
 
 def get_llm_response(message: str, conversation_history: list = None) -> str:
     if not API_KEY:
         logger.error("API key not configured")
-        raise HTTPException(status_code=500, detail="API key not configured")
+        raise HTTPException(
+            status_code=500, 
+            detail="API key not configured. Please set GEMINI_API_KEY environment variable."
+        )
     
     try:
         client = OpenAI(
@@ -50,7 +54,8 @@ def get_llm_response(message: str, conversation_history: list = None) -> str:
         logger.info(f"Sending request to Gemini with {len(messages)} messages")
         response = client.chat.completions.create(
             model="gemini-2.0-flash-exp",
-            messages=messages
+            messages=messages,
+            temperature=0.7,
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -58,8 +63,7 @@ def get_llm_response(message: str, conversation_history: list = None) -> str:
         raise HTTPException(status_code=500, detail=f"LLM API error: {str(e)}")
 
 @app.get("/")
-@app.get("/api/chat")
-def health_check():
+async def health_check():
     logger.info("Health check requested")
     return {
         "status": "healthy", 
@@ -68,7 +72,6 @@ def health_check():
     }
 
 @app.post("/")
-@app.post("/api/chat")
 async def chat(request: ChatRequest):
     logger.info(f"Chat request received: {request.message[:50]}...")
     try:
@@ -105,11 +108,6 @@ async def chat(request: ChatRequest):
         logger.error(f"Unexpected error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Add OPTIONS handler for CORS preflight
-@app.options("/")
-@app.options("/api/chat")
-async def options_handler():
-    return {"status": "ok"}
-
-# Vercel handler
-handler = Mangum(app, lifespan="off")
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
