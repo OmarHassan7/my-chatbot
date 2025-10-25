@@ -81,7 +81,7 @@ const ChatbotInterface: React.FC = () => {
               <div>
                 <h1 className="text-xl font-bold text-white">AI Chatbot</h1>
                 <p className="text-sm text-purple-300">
-                  Powered by Next.js & FastAPI
+                  Powered by Next.jsss & FastAPI
                 </p>
               </div>
             </div>

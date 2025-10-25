@@ -17,11 +17,21 @@
     "routes": [
         {
             "src": "/api/test",
-            "dest": "/api/test/index.py"
+            "dest": "/api/test/index.py",
+            "methods": [
+                "GET",
+                "POST",
+                "OPTIONS"
+            ]
         },
         {
             "src": "/api/chat",
-            "dest": "/api/chat/index.py"
+            "dest": "/api/chat/index.py",
+            "methods": [
+                "GET",
+                "POST",
+                "OPTIONS"
+            ]
         },
         {
             "src": "/(.*)",

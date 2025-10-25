@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -58,6 +58,7 @@ def get_llm_response(message: str, conversation_history: list = None) -> str:
         raise HTTPException(status_code=500, detail=f"LLM API error: {str(e)}")
 
 @app.get("/")
+@app.get("/api/chat")
 def health_check():
     logger.info("Health check requested")
     return {
@@ -67,7 +68,8 @@ def health_check():
     }
 
 @app.post("/")
-def chat(request: ChatRequest):
+@app.post("/api/chat")
+async def chat(request: ChatRequest):
     logger.info(f"Chat request received: {request.message[:50]}...")
     try:
         if not request.message.strip():
@@ -102,6 +104,12 @@ def chat(request: ChatRequest):
     except Exception as e:
         logger.error(f"Unexpected error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Add OPTIONS handler for CORS preflight
+@app.options("/")
+@app.options("/api/chat")
+async def options_handler():
+    return {"status": "ok"}
 
 # Vercel handler
 handler = Mangum(app, lifespan="off")
